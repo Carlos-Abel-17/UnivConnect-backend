@@ -2,6 +2,7 @@ import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { EmailinstiService } from './emailinsti.service';
 import { EmailInstiEntities } from 'src/core/entities/emailinsti.entity';
 import { emailVlidate } from './dto/emailVlidate.dto';
+import { VerifyCodeDto } from './dto/verifyCode.dto';
 
 @Controller('emailinsti')
 export class EmailinstiController {
@@ -13,5 +14,10 @@ export class EmailinstiController {
     async ValidateEmail(@Body() Body:emailVlidate):Promise<{ success: boolean; message: string; data:object } | null>{
         console.log(Body)
         return await this.EmailinstiService.ValidateEmail(Body.email);
+    }
+
+    @Post('verify-code')
+    async VerifyCode(@Body() dto:VerifyCodeDto){
+        return await this.EmailinstiService.VerifyCode(dto.email,dto.code)
     }
 }

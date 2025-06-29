@@ -5,6 +5,7 @@ import { ResponseDataError } from 'src/shared/helpers/Response.helpers';
 import { Repository } from 'typeorm';
 import  * as dotenv from 'dotenv'; 
 import {Resend} from 'resend'
+import { EmailVerificationEntities } from 'src/core/entities/email_verification.entity';
 
  dotenv.config();
 
@@ -13,7 +14,9 @@ export class EmailinstiService {
     private resend = new Resend(process.env.API_KEY_RESEND);
     constructor(
         @InjectRepository(EmailInstiEntities)
-        private EmailInstiRepository : Repository<EmailInstiEntities>
+        private EmailInstiRepository : Repository<EmailInstiEntities>,
+        @InjectRepository(EmailVerificationEntities)
+        private EmailVerificationRepo : Repository<EmailVerificationEntities>
     ){};
 
     async ValidateEmail(email:string):Promise<{ success: boolean; message: string; data:object } | null>{
@@ -32,6 +35,11 @@ export class EmailinstiService {
 
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         const DataCodeEmail = await this.SendEmailCode(email, code);
+
+        if(!DataCodeEmail.error){
+            await this.EmailVerificationRepo.save({email, code})
+        };
+
         console.log(DataCodeEmail)
         return {
         success: true,
@@ -46,8 +54,22 @@ export class EmailinstiService {
             from: 'onboarding@resend.dev',
             to: toEmail,
             subject: 'Código de Verificación',
-            html: `<h3>Tu código de verificación es:</h3><p><b>${code}</b></p>`,
+            html: `
+            <h1>UnivConnect</h1>
+            <h3>Tu código de verificación es:</h3><p><b>${code}</b></p>`,
         }) 
         return response;
+    }
+
+    async VerifyCode(email:string, code:string):Promise<{success:boolean; message: string}>{
+        const record = await this.EmailVerificationRepo.findOne({where:{email,code}});
+        
+        if(!record){
+                return { success: false, message: 'Código incorrecto o expirado' };
+        }
+
+        await this.EmailVerificationRepo.remove(record);
+
+        return { success: true, message: 'Correo verificado correctamente' };
     }
 }
