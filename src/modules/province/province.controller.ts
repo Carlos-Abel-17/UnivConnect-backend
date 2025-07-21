@@ -10,7 +10,7 @@ export class ProvinceController {
 
     @Get(':id')
     async FindProvince(@Param('id') id:string):Promise<ProvinceEntities[]>{
-        console.log(id)
+        //console.log(id)
         const province = await this.ProvinceService.FindOne(+id)
         return province;
     }

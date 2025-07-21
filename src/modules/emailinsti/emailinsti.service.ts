@@ -20,11 +20,11 @@ export class EmailinstiService {
     ){};
 
     async ValidateEmail(email:string):Promise<{ success: boolean; message: string; data:object } | null>{
-        console.log('recibo',email)
+        //console.log('recibo',email)
         const dominio = email.split('@')[1];
-        console.log(`@${dominio}`)
+        //console.log(`@${dominio}`)
         const ValidateDominio = await this.EmailInstiRepository.findOne({where:{email:`@${dominio}`}});
-
+        //console.log('validate dominio',ValidateDominio)
         if(!ValidateDominio){
             return {
                 success:false,
@@ -34,22 +34,33 @@ export class EmailinstiService {
         }
 
         const code = Math.floor(100000 + Math.random() * 900000).toString();
-        const DataCodeEmail = await this.SendEmailCode(email, code);
+        const {data, error} = await this.SendEmailCode(email, code);
 
-        if(!DataCodeEmail.error){
+        //console.log(data, error);
+
+        if(!error){
             await this.EmailVerificationRepo.save({email, code})
-        };
+        }else{
+            return{
+                success: false,
+                message: `Error al enviar el correo verifique el dominio ${ValidateDominio.institucion}`,
+                data:data
+            }
+        }
 
-        console.log(DataCodeEmail)
+        const DataResponse = {
+            ...data,
+            dataInsti:ValidateDominio 
+        }
         return {
         success: true,
-        message: 'Código enviado correctamente.',
-        data:DataCodeEmail
+        message: `Código enviado correctamente`,
+        data:DataResponse
     };
     }
 
     async SendEmailCode(toEmail:string, code:string){
-        console.log(toEmail,' ', code)
+        //console.log(toEmail,' ', code)
         const response = await this.resend.emails.send({
             from: 'onboarding@resend.dev',
             to: toEmail,

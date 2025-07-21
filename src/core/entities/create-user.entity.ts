@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Type } from 'class-transformer';
 
 @Entity('Users')
 export class CreateUserEntities{
@@ -13,6 +14,9 @@ export class CreateUserEntities{
 
  @Column()
     Birthdate:Date;
+
+ @Column()
+    Name_User:string;
 
  @Column('int2')
      Gender:number;
@@ -29,13 +33,15 @@ export class CreateUserEntities{
  @Column({nullable:true})
    PasswordView:string;
 
- @Column('int2',{ nullable: true })
+ @Column({type:'integer' })
     Departament:number;
   
- @Column('int2',{ nullable: true })
+ @Column({type:'integer' })
     Province:number;
   
- @Column('int2',{ nullable: true })
+ @Column({type:'integer' })
   District:number;
 
+  @Column({type:'integer'})
+  idInstitucion:number;
 };

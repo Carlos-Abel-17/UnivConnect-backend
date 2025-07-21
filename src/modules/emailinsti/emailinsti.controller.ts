@@ -12,7 +12,7 @@ export class EmailinstiController {
 
     @Post('validate')
     async ValidateEmail(@Body() Body:emailVlidate):Promise<{ success: boolean; message: string; data:object } | null>{
-        console.log(Body)
+        //console.log(Body)
         return await this.EmailinstiService.ValidateEmail(Body.email);
     }
 

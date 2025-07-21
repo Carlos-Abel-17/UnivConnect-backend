@@ -39,7 +39,7 @@ export class AuthService {
  
     async Validate(dto:LoginUser){
         const user = await this.AuthUserRepository.findOneBy({Email:dto.Email});
-        console.log(user)
+        //console.log(user)
         if(user && await bcrypt.compare(dto.Password, user.Password)){
             const {Password, ...result} = user;
             return result;

@@ -10,7 +10,7 @@ export class DistrictController {
 
     @Get(':id')
     async GetProvince(@Param('id') id:string):Promise<DistrictEntities[]>{
-        console.log(id);
+        //console.log(id);
         return  await this.DistrictService.FindDistrict(id);
         
     }

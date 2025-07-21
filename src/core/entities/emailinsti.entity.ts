@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 @Entity('emailinsti')
 export class EmailInstiEntities{
     @PrimaryColumn({type:'numeric'})
-    id:number;
+    idInstitucion:number;
 
     @Column({type:'text'})
     email:string;
