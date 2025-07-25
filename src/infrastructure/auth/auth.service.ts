@@ -21,26 +21,29 @@ export class AuthService {
         private jwtService:JwtService
     ){};
 
-    async CreateUser(dto:CreateUser){
-        try {
-            //console.log(dto)
-            const {Password, ...rest} = dto; 
-            const saltOrRounds = 10;
-            const hashedPassword = await bcrypt.hash(Password, saltOrRounds);  
+    // async CreateUser(dto:CreateUser){
+    //     try {
+    //         //console.log(dto)
+    //         const {Password, ...rest} = dto; 
+    //         const saltOrRounds = 10;
+    //         const hashedPassword = await bcrypt.hash(Password, saltOrRounds);  
 
-            const NewUser = this.AuthUserRepository.create({...rest, Password:hashedPassword,});
-            await this.AuthUserRepository.save(NewUser);
+    //         const NewUser = this.AuthUserRepository.create({...rest, Password:hashedPassword,});
+    //         await this.AuthUserRepository.save(NewUser);
 
-            return ResponseData('Usuario registrado', NewUser)
-        } catch (error) {
-            return ResponseDataError('Hubo un error en la creacion', error)
-        }
-    };
+    //         return ResponseData('Usuario registrado', NewUser)
+    //     } catch (error) {
+    //         return ResponseDataError('Hubo un error en la creacion', error)
+    //     }
+    // };
  
-    async Validate(dto:LoginUser){
-        const user = await this.AuthUserRepository.findOneBy({Email:dto.Email});
-        //console.log(user)
-        if(user && await bcrypt.compare(dto.Password, user.Password)){
+    async Validate(dto:any){
+        const user = await this.AuthUserRepository.findOneBy({Email:dto.datosUser.email});
+
+         if (!user || !dto.datosUser.password || !user.Password) {
+            throw new Error('Faltan credenciales para validar');
+        }
+        if(user && await bcrypt.compare(dto.datosUser.password, user.Password)){
             const {Password, ...result} = user;
             return result;
         }
@@ -48,9 +51,26 @@ export class AuthService {
     };
 
     async LoginUser(user:any){
-        const payload = {email:user.Email, password:user.Password};
-        return {
-            access_token:this.jwtService.sign(payload),
+        console.log('el user que llega a loginUser',user)
+        const payload = {
+        sub: user.IdUser,       // `sub` es el estándar para el subject del token
+        email: user.Email
+        };
+        if(payload){
+            return {
+                message:'login con exito',
+                access_token:this.jwtService.sign(payload, {
+                secret: process.env.JWT_SECRET,
+                expiresIn: '24h'
+            }),
+                status:'succeeded'
+            }
+        }else{
+            return {
+                message:'no se logro el login',
+                access_token:this.jwtService.sign(payload),
+                status:'failed'
+            }
         }
     };
 

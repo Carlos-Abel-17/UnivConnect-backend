@@ -6,10 +6,10 @@ export class LoginUser{
  
  @ApiProperty({example:'fulanito@gmail.com', description:'Correo valido'})
  @IsEmail()
-    Email:string;
+    email:string;
 
  @ApiProperty({example:'@guado123', description:'La contraseña encryptada debe de ser de 8 digitos como maximo'})
  @IsString()
  @MaxLength(8)
-    Password:string;
+    password:string;
 }

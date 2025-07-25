@@ -15,19 +15,20 @@ export class AuthController {
         private readonly AuthService:AuthService
     ){}
 
-    @Post('CreateUser')
-    @ApiOperation({ summary: 'Registrar un nuevo usuario'})
-    @ApiResponse({ status: 201, description: 'Usuario creado correctamente.'})
-    @ApiResponse({ status: 400, description: 'Datos inválidos.'})
-    CreateUser(@Body() dto:CreateUser){
-        return this.AuthService.CreateUser(dto);
-    };
+    // @Post('CreateUser')
+    // @ApiOperation({ summary: 'Registrar un nuevo usuario'})
+    // @ApiResponse({ status: 201, description: 'Usuario creado correctamente.'})
+    // @ApiResponse({ status: 400, description: 'Datos inválidos.'})
+    // CreateUser(@Body() dto:CreateUser){
+    //     return this.AuthService.CreateUser(dto);
+    // };
     
     @Post('Login')
     @ApiOperation({ summary: 'Inicio de session' })
     @ApiResponse({ status: 201, description: 'Inicio de session correctamente.' })
     @ApiResponse({ status: 400, description: 'Ocurrio algun problema con el inicio de session.' })
     async LoginUsers(@Body() body:LoginUser){
+        console.log(body)
         const user = await this.AuthService.Validate(body);
         if(!user){
             ResponseDataError('Correo o contraseña incorrectos',user)
